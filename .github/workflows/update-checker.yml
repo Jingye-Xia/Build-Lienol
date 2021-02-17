@@ -32,40 +32,40 @@ jobs:
     - name: Get Lienol Commit Hash
       id: getlienolHash
       run: |
-        git clone --depth 1 $REPO_URL -b $REPO_BRANCH lienol
-        cd /lienol
+        git clone --depth 1 $REPO_URL -b $REPO_BRANCH .lienol
+        cd .lienol
         echo "::set-output name=commitHash::$(git rev-parse HEAD)"
 
     - name: Get PassWall Commit Hash
       id: getpasswallHash
       run: |
-        git clone --depth 1 $PASSWALL_REPO_URL -b $PASSWALL_REPO_BRANCH passwall
-        cd /passwall
+        git clone --depth 1 $PASSWALL_REPO_URL -b $PASSWALL_REPO_BRANCH .passwall
+        cd .passwall
         echo "::set-output name=commitHash::$(git rev-parse HEAD)"
 
     - name: Compare Lienol Commit Hash
       id: cachelienolHash
       uses: actions/cache@v2
       with:
-        path: /lienol/commitHash
+        path: .lienol/commitHash
         key: HEAD-${{ steps.getlienolHash.outputs.commitHash }}
 
     - name: Compare PassWall Commit Hash
       id: cachepasswalllHash
       uses: actions/cache@v2
       with:
-        path: /passwall/commitHash
+        path: .passwall/commitHash
         key: HEAD-${{ steps.getpasswallHash.outputs.commitHash }}
 
     - name: Save New Lienol Commit Hash
       if: steps.cachelienolHash.outputs.cache-hit != 'true'
       run: |
-        echo ${{ steps.getlienolHash.outputs.commitHash }} | tee /lienol/commitHash
+        echo ${{ steps.getlienolHash.outputs.commitHash }} | tee .lienol/commitHash
 
     - name: Save New PassWall Commit Hash
       if: steps.cachepasswallHash.outputs.cache-hit != 'true'
       run: |
-        echo ${{ steps.getpasswallHash.outputs.commitHash }} | tee /passwall/commitHash
+        echo ${{ steps.getpasswallHash.outputs.commitHash }} | tee .passwall/commitHash
 
     - name: Trigger build
       if: steps.cachelienolHash.outputs.cache-hit != 'true' || steps.cachepasswallHash.outputs.cache-hit != 'true'
