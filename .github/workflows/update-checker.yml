@@ -19,6 +19,7 @@ env:
   HELLOWORLD_REPO_URL: https://github.com/fw876/helloworld
   HELLOWORLD_REPO_BRANCH: master
   SCKEY: ${{ secrets.SCKEY }}
+  TZ: Asia/Shanghai
 
 on:
   workflow_dispatch:
@@ -30,6 +31,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+    - name: Set timezone
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: sudo timedatectl set-timezone "$TZ"
 
     - name: Get Helloworld Commit Hash
       id: gethelloworldHash
