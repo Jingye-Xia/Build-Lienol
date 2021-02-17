@@ -47,14 +47,14 @@ jobs:
       id: cachelienolHash
       uses: actions/cache@v2
       with:
-        path: ./lienol/commitHash
+        path: ./lienol
         key: HEAD-${{ steps.getlienolHash.outputs.commitlienolHash }}
 
     - name: Compare PassWall Commit Hash
       id: cachepasswalllHash
       uses: actions/cache@v2
       with:
-        path: ./passwall/commitHash
+        path: ./passwall
         key: HEAD-${{ steps.getpasswallHash.outputs.commitpasswallHash }}
 
     - name: Save New Lienol Commit Hash
