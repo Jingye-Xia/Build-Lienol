@@ -37,7 +37,7 @@ jobs:
         echo "::set-output name=commitHash::$(git rev-parse HEAD)"
 
     - name: Compare PassWall Commit Hash
-      id: cachepasswalllHash
+      id: cachepasswallHash
       uses: actions/cache@v2
       with:
         path: .passwall
