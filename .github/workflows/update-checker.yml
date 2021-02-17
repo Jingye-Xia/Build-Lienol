@@ -12,8 +12,10 @@
 name: Update Checker
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
-  REPO_BRANCH: master
+  REPO_URL: https://github.com/Lienol/openwrt
+  REPO_BRANCH: main
+  PASSWALL_REPO_URL: https://github.com/xiaorouji/openwrt-passwall
+  PASSWALL_REPO_BRANCH: main
   SCKEY: ${{ secrets.SCKEY }}
 
 on:
@@ -27,42 +29,72 @@ jobs:
 
     steps:
 
-    - name: Get Commit Hash
-      id: getHash
+    - name: Get Lienol Commit Hash
+      id: getlienolHash
       run: |
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH .
-        echo "::set-output name=commitHash::$(git rev-parse HEAD)"
+        echo "::set-output name=commitlienolHash::$(git rev-parse HEAD)"
 
-    - name: Compare Commit Hash
-      id: cacheHash
+    - name: Get PassWall Commit Hash
+      id: getpasswallHash
+      run: |
+        git clone --depth 1 $REPO_URL -b $REPO_BRANCH .
+        echo "::set-output name=commitpasswallHash::$(git rev-parse HEAD)"
+
+    - name: Compare Lienol Commit Hash
+      id: cachelienolHash
       uses: actions/cache@v2
       with:
-        path: .commitHash
-        key: HEAD-${{ steps.getHash.outputs.commitHash }}
+        path: .commitlienolHash
+        key: HEAD-${{ steps.getlienolHash.outputs.commitlienolHash }}
 
-    - name: Save New Commit Hash
-      if: steps.cacheHash.outputs.cache-hit != 'true'
+    - name: Compare PassWall Commit Hash
+      id: cachepasswalllHash
+      uses: actions/cache@v2
+      with:
+        path: .commitpasswallHash
+        key: HEAD-${{ steps.getpasswallHash.outputs.commitpasswallHash }}
+
+    - name: Save New Lienol Commit Hash
+      if: steps.cachelienolHash.outputs.cache-hit != 'true'
       run: |
-        echo ${{ steps.getHash.outputs.commitHash }} | tee .commitHash
+        echo ${{ steps.getlienolHash.outputs.commitlienolHash }} | tee .commitlienolHash
+
+    - name: Save New PassWall Commit Hash
+      if: steps.cachepasswallHash.outputs.cache-hit != 'true'
+      run: |
+        echo ${{ steps.getpasswallHash.outputs.commitpasswallHash }} | tee .commitpasswallHash
 
     - name: Trigger build
-      if: steps.cacheHash.outputs.cache-hit != 'true'
+      if: steps.cachelienolHash.outputs.cache-hit != 'true' || steps.cachepasswallHash.outputs.cache-hit != 'true'
       uses: peter-evans/repository-dispatch@v1
       with:
         token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
         event-type: Source Code Update
 
     - name: WeChat notification
-      if: env.SCKEY && steps.cacheHash.outputs.cache-hit != 'true'
+      if: env.SCKEY && steps.cachelienolHash.outputs.cache-hit != 'true' && steps.cachepasswallHash.outputs.cache-hit != 'true'
       run: |
         echo "Sending message to WeChat..."
-        curl -s "https://sc.ftqq.com/${SCKEY}.send?text=Lienol固件编译开始"
+        curl -s "https://sc.ftqq.com/${SCKEY}.send?text=Lienol和PassWall源码更新，开始编译。"
 
     - name: WeChat notification
-      if: env.SCKEY && steps.cacheHash.outputs.cache-hit == 'true'
+      if: env.SCKEY && steps.cachelienolHash.outputs.cache-hit != 'true' && steps.cachepasswallHash.outputs.cache-hit == 'true'
       run: |
         echo "Sending message to WeChat..."
-        curl -s "https://sc.ftqq.com/${SCKEY}.send?text=今日Lienol源码没有更新"
+        curl -s "https://sc.ftqq.com/${SCKEY}.send?text=只有Lienol源码更新，开始编译。"
+
+    - name: WeChat notification
+      if: env.SCKEY && steps.cachelienolHash.outputs.cache-hit == 'true' && steps.cachepasswallHash.outputs.cache-hit != 'true'
+      run: |
+        echo "Sending message to WeChat..."
+        curl -s "https://sc.ftqq.com/${SCKEY}.send?text=只有PassWall源码更新，开始编译。"
+
+    - name: WeChat notification
+      if: env.SCKEY && steps.cachelienolHash.outputs.cache-hit == 'true' && steps.cachepasswallHash.outputs.cache-hit == 'true'
+      run: |
+        echo "Sending message to WeChat..."
+        curl -s "https://sc.ftqq.com/${SCKEY}.send?text=今日所有源码没有更新（Lienol）"
 
     - name: Delete workflow runs
       uses: GitRML/delete-workflow-runs@main
