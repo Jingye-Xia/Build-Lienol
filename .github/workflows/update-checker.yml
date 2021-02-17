@@ -46,7 +46,7 @@ jobs:
     - name: Save New Lienol Commit Hash
       if: steps.cachelienolHash.outputs.cache-hit != 'true'
       run: |
-        echo ${{ steps.getlienolHash.outputs.commitHash }} | tee .lienol
+        echo ${{ steps.getlienolHash.outputs.commitHash }} | tee .commitlienolHash
 
     - name: Get PassWall Commit Hash
       id: getpasswallHash
@@ -65,7 +65,7 @@ jobs:
     - name: Save New PassWall Commit Hash
       if: steps.cachepasswallHash.outputs.cache-hit != 'true'
       run: |
-        echo ${{ steps.getpasswallHash.outputs.commitHash }} | tee .passwall
+        echo ${{ steps.getpasswallHash.outputs.commitHash }} | tee .commitpasswallHash
 
     - name: Trigger build
       if: steps.cachelienolHash.outputs.cache-hit != 'true' || steps.cachepasswallHash.outputs.cache-hit != 'true'
