@@ -38,7 +38,7 @@ jobs:
     - name: Get PassWall Commit Hash
       id: getpasswallHash
       run: |
-        git clone --depth 1 $REPO_URL -b $REPO_BRANCH .
+        git clone --depth 1 $PASSWALL_REPO_URL -b $PASSWALL_REPO_BRANCH .
         echo "::set-output name=commitpasswallHash::$(git rev-parse HEAD)"
 
     - name: Compare Lienol Commit Hash
