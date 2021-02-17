@@ -87,17 +87,11 @@ jobs:
         $GITHUB_WORKSPACE/$DIY_P2_SH
 
     - name: SSH connection to Actions
-      uses: Jingye-Xia/ssh2actions@main
+      uses: Jingye-Xia/ssh2actions
       if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
-      with:
-        mode: ngrok
       env:
-        NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
-        NGROK_REGION: jp
-        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        SCKEY: ${{ secrets.SCKEY }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
     - name: Download package
       id: package
