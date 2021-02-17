@@ -32,6 +32,7 @@ jobs:
     - name: Get Lienol Commit Hash
       id: getlienolHash
       run: |
+        sudo -i
         cd /usr
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH lienol
         cd lienol
@@ -40,6 +41,7 @@ jobs:
     - name: Get PassWall Commit Hash
       id: getpasswallHash
       run: |
+        sudo -i
         cd /usr
         git clone --depth 1 $PASSWALL_REPO_URL -b $PASSWALL_REPO_BRANCH passwall
         cd passwall
@@ -62,12 +64,14 @@ jobs:
     - name: Save New Lienol Commit Hash
       if: steps.cachelienolHash.outputs.cache-hit != 'true'
       run: |
+        sudo -i
         cd /usr/lienol
         echo ${{ steps.getlienolHash.outputs.commitHash }} | tee .commitHash
 
     - name: Save New PassWall Commit Hash
       if: steps.cachepasswallHash.outputs.cache-hit != 'true'
       run: |
+        sudo -i
         cd /usr/passwall
         echo ${{ steps.getpasswallHash.outputs.commitHash }} | tee .commitHash
 
